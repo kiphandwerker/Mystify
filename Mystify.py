@@ -92,8 +92,3 @@ class Mystify:
 #     'bmi': [25.1, 30.2, 22.8],
 #     'visit_date': pd.to_datetime(['2023-01-10', '2023-02-15', '2023-03-20'])
 # })
-
-df = Mystify.GenerateData(100)
-synthetic_data = Mystify.Mystify(df)
-print(synthetic_data.head())
-Mystify.SaveCSV(df,"test")
