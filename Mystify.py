@@ -6,7 +6,7 @@ from datetime import timedelta
 fake = Faker()
 
 class Mystify:
-        
+
     def GenerateData(n = 100):
         data = pd.DataFrame({
         'patient_id': [f'P{str(i).zfill(4)}' for i in range(1, n+1)],  # Unique identifier
@@ -78,6 +78,11 @@ class Mystify:
                 synthetic[col] = [None for _ in range(len(df))]
 
         return synthetic
+    
+    def SaveCSV(df,name):
+        print("Saving CSV")
+        out = pd.DataFrame(df)
+        out.to_csv(f"..\\Mystify\\{name}.csv",header=True)
 
 # df = pd.DataFrame({
 #     'patient_id': ['P001', 'P002', 'P003'],
@@ -91,3 +96,4 @@ class Mystify:
 df = Mystify.GenerateData(100)
 synthetic_data = Mystify.Mystify(df)
 print(synthetic_data.head())
+Mystify.SaveCSV(df,"test")
