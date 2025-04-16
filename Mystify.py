@@ -44,24 +44,29 @@ class Mystify:
         })
         return data
 
-    def Mystify(self,df, seed=42):
+    def Mystify(self, df, seed=42, preserve_columns=None):
+        if preserve_columns is None:
+            preserve_columns = []
+
         np.random.seed(seed)
         random.seed(seed)
         Faker.seed(seed)
         synthetic = pd.DataFrame()
-        
+
         def detect_phi_column(col_name):
             col_name_lower = col_name.lower()
-            # Prioritize exact match first
             if col_name_lower in self.phi_keywords:
                 return self.phi_keywords[col_name_lower]
-            # Then look for partial match
             for key in self.phi_keywords:
                 if key in col_name_lower:
                     return self.phi_keywords[key]
             return None
-        
+
         for col in df.columns:
+            if col in preserve_columns:
+                synthetic[col] = df[col].copy()
+                continue
+
             dtype = df[col].dtype
             gen_phi = detect_phi_column(col)
 
@@ -73,8 +78,7 @@ class Mystify:
                 if pd.api.types.is_integer_dtype(df[col]):
                     synthetic[col] = np.random.randint(min_val, max_val + 1, size=len(df))
                 else:
-                    synthetic[col] = np.random.uniform(min_val, max_val, size=len(df))
-                    synthetic[col] = synthetic[col].round(2)
+                    synthetic[col] = np.random.uniform(min_val, max_val, size=len(df)).round(2)
 
             elif pd.api.types.is_categorical_dtype(df[col]) or df[col].dtype == 'object':
                 unique_vals = df[col].dropna().unique()
@@ -93,6 +97,7 @@ class Mystify:
 
         return synthetic
     
+    @staticmethod
     def SaveCSV(df,name):
         print("Saving CSV")
         out = pd.DataFrame(df)
