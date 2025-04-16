@@ -7,26 +7,68 @@ fake = Faker()
 
 class Mystify:
 
-    def __init__(self, PHIvariables = None):
-        if(PHIvariables is None):
-            self.phi_keywords = {
-                'name': lambda: fake.name(),
-                'first_name': lambda: fake.first_name(),
-                'last_name': lambda: fake.last_name(),
-                'email': lambda: fake.email(),
-                'address': lambda: fake.address().replace("\n", ", "),
-                'phone': lambda: fake.phone_number(),
-                'ssn': lambda: fake.ssn(),
-                'zip': lambda: fake.zipcode(),
-                'city': lambda: fake.city(),
-                'state': lambda: fake.state(),
-                'dob': lambda: fake.date_of_birth(minimum_age=18, maximum_age=90),
-            }
-        else:
-            self.phi_keywords = PHIvariables
+    def __init__(self):
+        self.phi_keywords = {
+            # Personal Identifiers
+            'name': lambda: fake.name(),
+            'first_name': lambda: fake.first_name(),
+            'last_name': lambda: fake.last_name(),
+            'middle_name': lambda: fake.first_name(),
+            'prefix': lambda: fake.prefix(),
+            'suffix': lambda: fake.suffix(),
+            'ssn': lambda: fake.ssn(),
+            'dob': lambda: fake.date_of_birth(minimum_age=18, maximum_age=90),
+            'age': lambda: random.randint(18, 90),
+            'gender': lambda: random.choice(['Male', 'Female', 'Non-binary', 'Other']),
+            'marital_status': lambda: random.choice(['Single', 'Married', 'Divorced', 'Widowed']),
+
+            # Contact Information
+            'email': lambda: fake.email(),
+            'phone': lambda: fake.phone_number(),
+            'phone_mobile': lambda: fake.phone_number(),
+            'phone_home': lambda: fake.phone_number(),
+            'phone_work': lambda: fake.phone_number(),
+
+            # Address Information
+            'address': lambda: fake.address().replace("\n", ", "),
+            'street_address': lambda: fake.street_address(),
+            'secondary_address': lambda: fake.secondary_address(),
+            'city': lambda: fake.city(),
+            'state': lambda: fake.state(),
+            'zip': lambda: fake.zipcode(),
+            'country': lambda: fake.country(),
+
+            # Employment/Insurance
+            'employer': lambda: fake.company(),
+            'job_title': lambda: fake.job(),
+            'insurance_provider': lambda: fake.company(),
+            'insurance_id': lambda: fake.bothify(text='??########'),
+
+            # Medical Info (simulated, not directly supported by Faker)
+            'medical_record_number': lambda: fake.bothify(text='MRN#######'),
+            'patient_id': lambda: fake.uuid4(),
+            'physician': lambda: fake.name(),
+            'diagnosis': lambda: fake.sentence(nb_words=4).rstrip('.'),
+            'treatment': lambda: fake.sentence(nb_words=6).rstrip('.'),
+            'medication': lambda: fake.word().capitalize(),
+
+            # Financial Info
+            'credit_card': lambda: fake.credit_card_number(),
+            'credit_card_provider': lambda: fake.credit_card_provider(),
+            'bank_account': lambda: fake.bban(),
+            'routing_number': lambda: fake.iban(),
+
+            # Unique Identifiers
+            'device_id': lambda: fake.uuid4(),
+            'ip_address': lambda: fake.ipv4_public(),
+            'mac_address': lambda: fake.mac_address(),
+            'user_id': lambda: fake.user_name(),
+            'url': lambda: fake.url()
+        }
 
     def ShowPHIvars(self):
-        return(self.phi_keywords)
+        for key in self.phi_keywords:
+            print(key)
 
     def GenerateData(self,n = 100):
         data = pd.DataFrame({
