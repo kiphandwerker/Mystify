@@ -7,6 +7,23 @@ fake = Faker()
 
 class Mystify:
 
+    def __init__(self):
+        self.phi_keywords = {
+            'name': lambda: fake.name(),
+            'first_name': lambda: fake.first_name(),
+            'last_name': lambda: fake.last_name(),
+            'email': lambda: fake.email(),
+            'address': lambda: fake.address().replace("\n", ", "),
+            'phone': lambda: fake.phone_number(),
+            'ssn': lambda: fake.ssn(),
+            'zip': lambda: fake.zipcode(),
+            'city': lambda: fake.city(),
+            'state': lambda: fake.state(),
+            'dob': lambda: fake.date_of_birth(minimum_age=18, maximum_age=90),
+        }
+        # I want to pass phi_keywords here 
+        pass
+
     def GenerateData(n = 100):
         data = pd.DataFrame({
         'patient_id': [f'P{str(i).zfill(4)}' for i in range(1, n+1)],  # Unique identifier
@@ -20,26 +37,11 @@ class Mystify:
         })
         return data
 
-    def Mystify(df, seed=42):
+    def Mystify(df, phi_keywords, seed=42):
         np.random.seed(seed)
         random.seed(seed)
         Faker.seed(seed)
         synthetic = pd.DataFrame()
-
-        # Basic PHI keyword matching (can be extended)
-        phi_keywords = {
-            'name': lambda: fake.name(),
-            'first_name': lambda: fake.first_name(),
-            'last_name': lambda: fake.last_name(),
-            'email': lambda: fake.email(),
-            'address': lambda: fake.address().replace("\n", ", "),
-            'phone': lambda: fake.phone_number(),
-            'ssn': lambda: fake.ssn(),
-            'zip': lambda: fake.zipcode(),
-            'city': lambda: fake.city(),
-            'state': lambda: fake.state(),
-            'dob': lambda: fake.date_of_birth(minimum_age=18, maximum_age=90),
-        }
 
         def detect_phi_column(col_name):
             for key in phi_keywords:
