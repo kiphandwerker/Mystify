@@ -143,4 +143,4 @@ class Mystify:
     def SaveCSV(df,name):
         print("Saving CSV")
         out = pd.DataFrame(df)
-        out.to_csv(f"..\\Mystify\\{name}.csv",header=True)
+        out.to_csv(f"..\\Mystify\\{name}.csv",header=True, index=False)
