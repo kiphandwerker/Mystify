@@ -44,14 +44,14 @@ class Mystify:
         })
         return data
 
-    def Mystify(self, df, seed=42, preserve_columns=None):
+    def MystifyData(self, df, seed=42, preserve_columns=None):
         if preserve_columns is None:
             preserve_columns = []
 
         np.random.seed(seed)
         random.seed(seed)
         Faker.seed(seed)
-        synthetic = pd.DataFrame()
+        mystified = pd.DataFrame()
 
         def detect_phi_column(col_name):
             col_name_lower = col_name.lower()
@@ -64,38 +64,38 @@ class Mystify:
 
         for col in df.columns:
             if col in preserve_columns:
-                synthetic[col] = df[col].copy()
+                mystified[col] = df[col].copy()
                 continue
 
             dtype = df[col].dtype
             gen_phi = detect_phi_column(col)
 
             if gen_phi:
-                synthetic[col] = [gen_phi() for _ in range(len(df))]
+                mystified[col] = [gen_phi() for _ in range(len(df))]
 
             elif pd.api.types.is_numeric_dtype(df[col]):
                 min_val, max_val = df[col].min(), df[col].max()
                 if pd.api.types.is_integer_dtype(df[col]):
-                    synthetic[col] = np.random.randint(min_val, max_val + 1, size=len(df))
+                    mystified[col] = np.random.randint(min_val, max_val + 1, size=len(df))
                 else:
-                    synthetic[col] = np.random.uniform(min_val, max_val, size=len(df)).round(2)
+                    mystified[col] = np.random.uniform(min_val, max_val, size=len(df)).round(2)
 
             elif pd.api.types.is_categorical_dtype(df[col]) or df[col].dtype == 'object':
                 unique_vals = df[col].dropna().unique()
                 if len(unique_vals) > 0:
-                    synthetic[col] = np.random.choice(unique_vals, size=len(df))
+                    mystified[col] = np.random.choice(unique_vals, size=len(df))
                 else:
-                    synthetic[col] = ['' for _ in range(len(df))]
+                    mystified[col] = ['' for _ in range(len(df))]
 
             elif pd.api.types.is_datetime64_any_dtype(df[col]):
                 min_date, max_date = df[col].min(), df[col].max()
                 date_range = (max_date - min_date).days
-                synthetic[col] = [min_date + timedelta(days=np.random.randint(0, date_range + 1)) for _ in range(len(df))]
+                mystified[col] = [min_date + timedelta(days=np.random.randint(0, date_range + 1)) for _ in range(len(df))]
 
             else:
-                synthetic[col] = [None for _ in range(len(df))]
+                mystified[col] = [None for _ in range(len(df))]
 
-        return synthetic
+        return mystified
     
     @staticmethod
     def SaveCSV(df,name):
