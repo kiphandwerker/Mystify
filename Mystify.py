@@ -7,46 +7,50 @@ fake = Faker()
 
 class Mystify:
 
-    def __init__(self):
-        self.phi_keywords = {
-            'name': lambda: fake.name(),
-            'first_name': lambda: fake.first_name(),
-            'last_name': lambda: fake.last_name(),
-            'email': lambda: fake.email(),
-            'address': lambda: fake.address().replace("\n", ", "),
-            'phone': lambda: fake.phone_number(),
-            'ssn': lambda: fake.ssn(),
-            'zip': lambda: fake.zipcode(),
-            'city': lambda: fake.city(),
-            'state': lambda: fake.state(),
-            'dob': lambda: fake.date_of_birth(minimum_age=18, maximum_age=90),
-        }
-        # I want to pass phi_keywords here 
-        pass
+    def __init__(self, PHIvariables = None):
+        if(PHIvariables is None):
+            self.phi_keywords = {
+                'name': lambda: fake.name(),
+                'first_name': lambda: fake.first_name(),
+                'last_name': lambda: fake.last_name(),
+                'email': lambda: fake.email(),
+                'address': lambda: fake.address().replace("\n", ", "),
+                'phone': lambda: fake.phone_number(),
+                'ssn': lambda: fake.ssn(),
+                'zip': lambda: fake.zipcode(),
+                'city': lambda: fake.city(),
+                'state': lambda: fake.state(),
+                'dob': lambda: fake.date_of_birth(minimum_age=18, maximum_age=90),
+            }
+        else:
+            self.phi_keywords = PHIvariables
 
-    def GenerateData(n = 100):
+    def ShowPHIvars(self):
+        return(self.phi_keywords)
+
+    def GenerateData(self,n = 100):
         data = pd.DataFrame({
-        'patient_id': [f'P{str(i).zfill(4)}' for i in range(1, n+1)],  # Unique identifier
-        'age': np.random.randint(18, 90, size=n),                      # Numeric: age
-        'gender': np.random.choice(['Male', 'Female'], size=n),       # Categorical: gender
-        'bmi': np.round(np.random.normal(27, 5, size=n), 1),           # Numeric: BMI
-        'smoker': np.random.choice(['Yes', 'No'], size=n, p=[0.2, 0.8]),  # Categorical: smoking status
-        'systolic_bp': np.random.randint(100, 180, size=n),            # Numeric: systolic blood pressure
-        'cholesterol_level': np.random.choice(['Normal', 'Borderline', 'High'], size=n, p=[0.5, 0.3, 0.2]),  # Categorical
-        'visit_date': pd.to_datetime('2025-01-01') + pd.to_timedelta(np.random.randint(0, 365, size=n), unit='days')  # Date
+            'patient_id': [f'P{str(i).zfill(4)}' for i in range(1, n+1)],  # Unique identifier
+            'age': np.random.randint(18, 90, size=n),                      # Numeric: age
+            'gender': np.random.choice(['Male', 'Female'], size=n),       # Categorical: gender
+            'bmi': np.round(np.random.normal(27, 5, size=n), 1),           # Numeric: BMI
+            'smoker': np.random.choice(['Yes', 'No'], size=n, p=[0.2, 0.8]),  # Categorical: smoking status
+            'systolic_bp': np.random.randint(100, 180, size=n),            # Numeric: systolic blood pressure
+            'cholesterol_level': np.random.choice(['Normal', 'Borderline', 'High'], size=n, p=[0.5, 0.3, 0.2]),  # Categorical
+            'visit_date': pd.to_datetime('2025-01-01') + pd.to_timedelta(np.random.randint(0, 365, size=n), unit='days')  # Date
         })
         return data
 
-    def Mystify(df, phi_keywords, seed=42):
+    def Mystify(self,df, seed=42):
         np.random.seed(seed)
         random.seed(seed)
         Faker.seed(seed)
         synthetic = pd.DataFrame()
 
         def detect_phi_column(col_name):
-            for key in phi_keywords:
+            for key in self.phi_keywords:
                 if key in col_name.lower():
-                    return phi_keywords[key]
+                    return self.phi_keywords[key]
             return None
 
         for col in df.columns:
