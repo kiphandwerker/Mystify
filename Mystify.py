@@ -31,6 +31,9 @@ class Mystify:
     def GenerateData(self,n = 100):
         data = pd.DataFrame({
             'patient_id': [f'P{str(i).zfill(4)}' for i in range(1, n+1)],  # Unique identifier
+            'first_name': [fake.first_name() for _ in range(1, n+1)],
+            'last_name': [fake.last_name() for _ in range(1, n+1)],
+            'ssn':[fake.ssn() for _ in range(1, n+1)],
             'age': np.random.randint(18, 90, size=n),                      # Numeric: age
             'gender': np.random.choice(['Male', 'Female'], size=n),       # Categorical: gender
             'bmi': np.round(np.random.normal(27, 5, size=n), 1),           # Numeric: BMI
@@ -46,13 +49,18 @@ class Mystify:
         random.seed(seed)
         Faker.seed(seed)
         synthetic = pd.DataFrame()
-
+        
         def detect_phi_column(col_name):
+            col_name_lower = col_name.lower()
+            # Prioritize exact match first
+            if col_name_lower in self.phi_keywords:
+                return self.phi_keywords[col_name_lower]
+            # Then look for partial match
             for key in self.phi_keywords:
-                if key in col_name.lower():
+                if key in col_name_lower:
                     return self.phi_keywords[key]
             return None
-
+        
         for col in df.columns:
             dtype = df[col].dtype
             gen_phi = detect_phi_column(col)
@@ -89,12 +97,3 @@ class Mystify:
         print("Saving CSV")
         out = pd.DataFrame(df)
         out.to_csv(f"..\\Mystify\\{name}.csv",header=True)
-
-# df = pd.DataFrame({
-#     'patient_id': ['P001', 'P002', 'P003'],
-#     'first_name': ['Alice', 'Bob', 'Carol'],
-#     'email': ['a@example.com', 'b@example.com', 'c@example.com'],
-#     'age': [34, 45, 29],
-#     'bmi': [25.1, 30.2, 22.8],
-#     'visit_date': pd.to_datetime(['2023-01-10', '2023-02-15', '2023-03-20'])
-# })
