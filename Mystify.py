@@ -70,7 +70,7 @@ class Mystify:
         for key in self.phi_keywords:
             print(key)
 
-    def GenerateData(self,n = 100):
+    def GenerateData(self,n = 100, MoreFields = []):
         data = pd.DataFrame({
             'patient_id': [f'P{str(i).zfill(4)}' for i in range(1, n+1)],  # Unique identifier
             'first_name': [fake.first_name() for _ in range(1, n+1)],
@@ -84,6 +84,13 @@ class Mystify:
             'cholesterol_level': np.random.choice(['Normal', 'Borderline', 'High'], size=n, p=[0.5, 0.3, 0.2]),  # Categorical
             'visit_date': pd.to_datetime('2025-01-01') + pd.to_timedelta(np.random.randint(0, 365, size=n), unit='days')  # Date
         })
+        for field in MoreFields:
+            generator = self.phi_keywords.get(field)
+            if generator:
+                data[field] = [generator() for _ in range(n)]
+            else:
+                print(f"Warning: '{field}' not found in phi_keywords and will be skipped.")
+
         return data
 
     def MystifyData(self, df, seed=42, preserve_columns=None):
